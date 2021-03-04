@@ -45,14 +45,16 @@ def results():
     """Displays results for current weather conditions."""
     # TODO: Use 'request.args' to retrieve the city & units from the query
     # parameters.
-    city = ''
-    units = ''
+    city = request.args.get('city')
+    units = request.args.get('units')
 
     params = {
         # TODO: Enter query parameters here for the 'appid' (your api key),
         # the city, and the units (metric or imperial).
         # See the documentation here: https://openweathermap.org/current
-
+        'appid': API_KEY,
+        'q': city,
+        'units': units
     }
 
     result_json = requests.get(API_URL, params=params).json()
@@ -66,15 +68,18 @@ def results():
     # For the sunrise & sunset variables, I would recommend to turn them into
     # datetime objects. You can do so using the `datetime.fromtimestamp()` 
     # function.
+    sun_up = datetime.fromtimestamp(result_json['sys']['sunrise'])
+    sun_down = datetime.fromtimestamp(result_json['sys']['sunset'])
+
     context = {
         'date': datetime.now(),
-        'city': '',
-        'description': '',
-        'temp': '',
-        'humidity': '',
-        'wind_speed': '',
-        'sunrise': '',
-        'sunset': '',
+        'city': city,
+        'description':result_json['weather'][0]['description'],
+        'temp': result_json['main']['temp'],
+        'humidity': result_json['main']['humidity'],
+        'wind_speed': result_json['wind']['speed'],
+        'sunrise': sun_up,
+        'sunset': sun_down,
         'units_letter': get_letter_for_units(units)
     }
 
@@ -86,20 +91,31 @@ def comparison_results():
     """Displays the relative weather for 2 different cities."""
     # TODO: Use 'request.args' to retrieve the cities & units from the query
     # parameters.
-    city1 = ''
-    city2 = ''
-    units = ''
+    city1 = request.args.get('city1')
+    city2 = request.args.get('city2')
+    units = request.args.get('units')
 
     # TODO: Make 2 API calls, one for each city. HINT: You may want to write a 
     # helper function for this!
-
-
+    def helper():
+        params = {
+            'appid': API_KEY,
+            'q': city,
+            'units': units
+        }
+        return requests.get(API_URL, params=params).json()
     # TODO: Pass the information for both cities in the context. Make sure to
     # pass info for the temperature, humidity, wind speed, and sunset time!
     # HINT: It may be useful to create 2 new dictionaries, `city1_info` and 
     # `city2_info`, to organize the data.
     context = {
+        'city1_info':{
 
+        }
+
+        'city2_info':{
+            
+        }
     }
 
     return render_template('comparison_results.html', **context)
