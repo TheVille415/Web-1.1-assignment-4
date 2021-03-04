@@ -94,27 +94,41 @@ def comparison_results():
     city1 = request.args.get('city1')
     city2 = request.args.get('city2')
     units = request.args.get('units')
-
     # TODO: Make 2 API calls, one for each city. HINT: You may want to write a 
     # helper function for this!
-    def helper():
+    def calling(city):
         params = {
             'appid': API_KEY,
             'q': city,
             'units': units
         }
         return requests.get(API_URL, params=params).json()
+
+    city1_call = calling(city1)
+    city2_call = calling(city2)
     # TODO: Pass the information for both cities in the context. Make sure to
     # pass info for the temperature, humidity, wind speed, and sunset time!
     # HINT: It may be useful to create 2 new dictionaries, `city1_info` and 
     # `city2_info`, to organize the data.
+
     context = {
-        'city1_info':{
+        'date': datetime.now(),
+        'units_letter': get_letter_for_units(units),
 
-        }
+        'city1_info': {
+            'city': city1_call['name'],
+            'temp':city1_call['main']['temp'],
+            'humidity': city1_call['main']['humidity'],
+            'wind': city1_call['wind']['speed'],
+            'sunset': datetime.fromtimestamp(city1_call['sys']['sunset'])
+        },
 
-        'city2_info':{
-            
+        'city2_info': {
+            'city': city2_call['name'],
+            'temp':city2_call['main']['temp'],
+            'humidity': city2_call['main']['humidity'],
+            'wind': city2_call['wind']['speed'],
+            'sunset': datetime.fromtimestamp(city2_call['sys']['sunset'])
         }
     }
 
